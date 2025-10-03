@@ -1,0 +1,54 @@
+# docker-compose.yml
+services:
+  database:
+    image: mysql:8.4
+    command:
+      - --mysql-native-password=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: supersecretroot
+
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "127.0.0.1",
+          "-uroot",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "3308:3306"
+
+  backend:
+    image: ${DOCKERHUB_USERNAME}/lemp-backend:latest
+    platform: linux/amd64 # pin to host arch
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      database:
+        condition: service_healthy
+    # Publish if you want to access backend directly from host
+    ports:
+      - "8000:8000" # change to match your app’s internal port
+    # IMPORTANT: ensure the backend listens on 0.0.0.0:8000 inside the container
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME}/lemp-frontend:latest
+    platform: linux/amd64 # pin to host arch
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:

@@ -1,0 +1,48 @@
+# docker-compose.dev.yml (updated)
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    # Optional: publish for dev if you need host access
+    ports:
+      - "3308:3306"
+
+  backend:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000" # ensure your app listens on 8000 inside container
+
+  frontend:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "8080:80" # nginx or whatever serves on 80 in container
+
+volumes:
+  db_data:

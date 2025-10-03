@@ -1,0 +1,390 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>LEMP Tasks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      /* Minimal, bright, editorial style — no resemblance to previous dark/glass UI */
+      :root {
+        --bg: #fafaf7;
+        --text: #1b1b1f;
+        --muted: #5f6368;
+        --border: #d9d9d3;
+        --accent: #0f766e; /* teal */
+        --accent-2: #f97316; /* orange */
+        --error: #b91c1c;
+        --success: #166534;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial;
+        background: linear-gradient(
+              0deg,
+              rgba(15, 118, 110, 0.05),
+              rgba(249, 115, 22, 0.05)
+            )
+            fixed,
+          radial-gradient(
+              1000px 500px at 0% 0%,
+              rgba(0, 0, 0, 0.02),
+              transparent 60%
+            )
+            fixed,
+          #fafaf7;
+        color: var(--text);
+      }
+
+      .page {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
+      }
+
+      /* Header: left title (serif), right clock (mono) */
+      .header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        gap: 16px;
+        margin-bottom: 32px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 16px;
+      }
+
+      .title {
+        font-family: "Georgia", "Times New Roman", serif;
+        font-size: clamp(28px, 5vw, 44px);
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+
+      .subtitle {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .clock {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 14px;
+        color: var(--muted);
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        padding: 8px 12px;
+        background: #fff;
+      }
+
+      .clock .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+      }
+
+      /* Content */
+      .section {
+        margin-top: 28px;
+      }
+
+      .section h2 {
+        font-size: 18px;
+        margin: 0 0 10px;
+        font-weight: 600;
+      }
+
+      /* Form: bordered input, mono placeholder, simple button */
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        appearance: none;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-size: 15px;
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      input[type="text"]::placeholder {
+        color: var(--muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 13px;
+      }
+
+      input[type="text"]:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.15);
+      }
+
+      button {
+        border: 1px solid var(--border);
+        background: linear-gradient(0deg, #fff, #fff);
+        color: var(--text);
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.05s ease, box-shadow 0.15s ease;
+      }
+
+      button:hover {
+        box-shadow: 0 1px 0 #00000008, 0 6px 18px #0000000f;
+      }
+
+      button:active {
+        transform: translateY(1px);
+      }
+
+      .btn-accent {
+        border-color: #0f766e22;
+        background: linear-gradient(0deg, #0f766e, #0f766e);
+        color: #fff;
+      }
+
+      /* Message */
+      #msg {
+        min-height: 18px;
+        margin-top: 10px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      /* Task list: flat cards with left title, right meta */
+      .list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0 0 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .item .title {
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .item .meta {
+        font-size: 12px;
+        color: var(--muted);
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      /* Footer note */
+      .note {
+        margin-top: 24px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <div>
+          <h1 class="title">LEMP Tasks</h1>
+          <p class="subtitle">
+            Minimal task tracker hooked to PHP/Nginx and MySQL
+          </p>
+        </div>
+        <div class="clock">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="time">--:--:--</span>
+          <button id="getTimeBtn" aria-label="Refresh time">Refresh</button>
+        </div>
+      </header>
+
+      <section class="section">
+        <h2>Add a task</h2>
+        <form id="createTaskForm" class="form-row" autocomplete="off">
+          <input
+            type="text"
+            id="title"
+            placeholder="Write a concise task title…"
+            required
+          />
+          <button type="submit" class="btn-accent">Add</button>
+        </form>
+        <div id="msg"></div>
+      </section>
+
+      <section class="section">
+        <h2>Tasks</h2>
+        <ul id="task-list" class="list"></ul>
+        <p class="note">
+          Tasks are fetched from /api/tasks. Time from /api/time.
+        </p>
+      </section>
+    </main>
+
+    <script>
+      // Elements
+      const msgDiv = document.getElementById("msg");
+      const timeDiv = document.getElementById("time");
+      const getTimeBtn = document.getElementById("getTimeBtn");
+      const taskList = document.getElementById("task-list");
+      const createTaskForm = document.getElementById("createTaskForm");
+      const titleInput = document.getElementById("title");
+
+      // Messaging
+      const showMessage = (message, isError = false) => {
+        msgDiv.textContent = message;
+        msgDiv.style.color = isError
+          ? getColor("--error")
+          : getColor("--success");
+      };
+
+      const getColor = (varName) =>
+        getComputedStyle(document.documentElement)
+          .getPropertyValue(varName)
+          .trim() || "#000";
+
+      // Time formatting
+      const formatTime = (isoOrString) => {
+        try {
+          const d = new Date(isoOrString);
+          if (!isNaN(d.getTime())) {
+            return d.toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            });
+          }
+        } catch (_) {}
+        return String(isoOrString ?? "");
+      };
+
+      // API: time
+      const getTime = () => {
+        fetch("/api/time")
+          .then((r) => r.json())
+          .then((d) => {
+            const t = d.time ?? d.now ?? d.server_time ?? "";
+            timeDiv.textContent = formatTime(t);
+          })
+          .catch((e) => {
+            timeDiv.textContent = "API error";
+            console.error(e);
+          });
+      };
+
+      // Render tasks
+      const renderTasks = (tasks) => {
+        taskList.innerHTML = "";
+        tasks.forEach((task) => {
+          const li = document.createElement("li");
+          li.className = "item";
+
+          const titleSpan = document.createElement("span");
+          titleSpan.className = "title";
+          titleSpan.textContent = task.title ?? task.name ?? "(untitled)";
+
+          const metaSpan = document.createElement("span");
+          metaSpan.className = "meta";
+          const createdAt = task.created_at ?? task.createdAt ?? null;
+          metaSpan.textContent = createdAt
+            ? `Created ${formatTime(createdAt)}`
+            : "";
+
+          li.appendChild(titleSpan);
+          li.appendChild(metaSpan);
+          taskList.appendChild(li);
+        });
+      };
+
+      // API: tasks
+      const getTasks = () => {
+        fetch("/api/tasks")
+          .then((r) => r.json())
+          .then((data) => {
+            const tasks = data.tasks ?? data.data ?? [];
+            renderTasks(tasks);
+          })
+          .catch((e) => {
+            showMessage("Failed to fetch tasks", true);
+            console.error(e);
+          });
+      };
+
+      // Create task
+      createTaskForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const title = titleInput.value.trim();
+        if (!title) return;
+
+        fetch("/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ task: title }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.message) {
+              showMessage(data.message);
+              titleInput.value = "";
+              getTasks();
+            } else if (data.error) {
+              showMessage(data.error, true);
+            } else {
+              showMessage("Unknown response from server", true);
+            }
+          })
+          .catch((e) => {
+            showMessage("Failed to create task", true);
+
+            console.error(e);
+          });
+      });
+
+      getTimeBtn.addEventListener("click", getTime);
+
+      // Initial load + passive refresh every 45s
+      getTime();
+      getTasks();
+      const timeInterval = setInterval(getTime, 45000);
+    </script>
+  </body>
+</html>
