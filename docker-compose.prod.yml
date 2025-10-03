@@ -1,6 +1,6 @@
 # docker-compose.yml
 services:
-  database:
+  db:
     image: mysql:8.4
     command:
       - --mysql-native-password=ON
@@ -35,7 +35,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
     depends_on:
-      database:
+      db:
         condition: service_healthy
     # Publish if you want to access backend directly from host
     ports:
